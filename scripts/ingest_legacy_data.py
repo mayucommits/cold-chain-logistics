@@ -47,7 +47,7 @@ print("Connecting to legacy MSSQL Database...")
 connection_string = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
         f"SERVER={db_host},{db_port};"
-        f"DATABASE=master;"
+        f"DATABASE=ColdChainLogistics;"
         f"UID={db_user};"
         f"PWD={db_password};"
         f"Encrypt=no;"
