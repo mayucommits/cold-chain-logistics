@@ -348,53 +348,104 @@ GO
 
 ---
 
-# Phase 7: Future Implementation Roadmap
+### Connecting to the Database
 
-The following stages will be developed as we progress through the project.
+Frostline uses **Microsoft SQL Server 2022 Developer Edition** running locally inside a Docker container.
 
-- [ ] Data exploration and analysis
-- [ ] Data cleaning and preprocessing
-- [ ] AI/LLM integration
-- [ ] Embeddings and vector database
-- [ ] Retrieval-Augmented Generation (RAG)
-- [ ] AI agents and orchestration
-- [ ] Backend API development
-- [ ] Frontend application
-- [ ] AWS infrastructure and deployment
-- [ ] Monitoring and production readiness
+We use the Microsoft **SQL Server (mssql)** extension in Visual Studio Code to connect to and manage the database.
 
----
+### 1. Database Environment
 
-# Infrastructure Architecture
+| Component | Configuration |
+|---|---|
+| Database Engine | Microsoft SQL Server 2022 |
+| Edition | Developer Edition |
+| Runtime | Docker Desktop |
+| Container Name | `sqlserver` |
+| Host | `localhost` |
+| Port | `1433` |
+| Database | `ColdChainLogistics` |
+| Authentication | SQL Login |
+| Username | `sa` |
+| VS Code Extension | SQL Server (mssql) by Microsoft |
 
-```text
-              WINDOWS MACHINE
-                     |
-          +----------+----------+
-          |                     |
-          v                     v
-    Python 3.12             Docker Desktop
-          |                     |
-       Pandas                  Docker
-          |                     |
-     Data Processing            v
-          |              SQL Server 2022
-          |                     |
-          +---- SQLAlchemy -----+
-                    |
-                  pyodbc
-                    |
-              ODBC Driver 18
-                    |
-                    v
-           ColdChainLogistics
-                    |
-                    v
-         TBL_SC_FLEET_HIST_RAW
+### 2. Start SQL Server
+
+Ensure Docker Desktop is running.
+
+Check the SQL Server container:
+
+```powershell
+docker ps
 ```
 
-**Development principle:** Keep the database local during development. Introduce AWS services when the application requires cloud deployment, while considering Free Tier eligibility and actual usage costs.
+If the container is stopped, start it:
 
----
+```powershell
+docker start sqlserver
+```
 
-**Current implementation milestone:** Local SQL Server setup, Python database connectivity and legacy data ingestion.
+### 3. Connect Through VS Code
+
+Install the **SQL Server (mssql)** extension published by Microsoft.
+
+Open the Command Palette (`Ctrl + Shift + P`) and select:
+
+`MS SQL: Connect`
+
+Use the following connection settings:
+
+- Profile Name: `Frostline Local SQL Server`
+- Server Name: `localhost`
+- Port: `1433`
+- Authentication Type: `SQL Login`
+- Username: `sa`
+- Password: Your local SQL Server password
+- Database: `ColdChainLogistics`
+- Trust Server Certificate: Enabled
+- Encrypt: Optional
+
+Test the connection and click Connect.
+
+### 4. Verify the Database Connection
+
+Open a new SQL query in VS Code and execute:
+
+```sql
+SELECT DB_NAME() AS CurrentDatabase, COUNT(*) AS TotalRecords FROM dbo.TBL_SC_FLEET_HIST_RAW;
+```
+
+Expected database: `ColdChainLogistics`
+
+Expected record count: `32065`
+
+### 5. Database Explorer
+
+Use the SQL Server panel in VS Code to explore:
+
+- Tables
+- Views
+- Synonyms
+- Programmability
+- External Resources
+
+The existing legacy table is:
+
+`dbo.TBL_SC_FLEET_HIST_RAW`
+
+### 6. Python Database Connectivity
+
+Python connects to SQL Server through the following stack:
+
+`Python → SQLAlchemy → pyodbc → ODBC Driver 18 → SQL Server`
+
+Database connection settings are stored in the project's `.env` file. Never commit database credentials to GitHub.
+
+### 7. Important Notes
+
+- SQL Server runs locally through Docker; it is not hosted on AWS.
+- The SQL Server data volume persists database files across container restarts.
+- VS Code is our primary interface for writing and executing SQL queries.
+- Python is used for data ingestion, transformation, analytics and machine learning.
+- Azure Data Studio is not required for this project.
+- Keep sensitive credentials in `.env` and exclude the file through `.gitignore`.
