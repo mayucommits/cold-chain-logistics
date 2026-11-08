@@ -159,7 +159,7 @@ def parse_and_chunk_document(doc_path: Path) -> list[Document]:
 # ==========================================
 # 5. INCREMENTAL PIPELINE WITH BATCHING
 # ==========================================
-policy_dir = project_root / "data" / "policy"
+policy_dir = project_root / "policy"
 target_patterns = ["*.md", "*.txt", "*.pdf", "*.csv", "*.xlsx"]
 current_files = {}
 for pattern in target_patterns:
